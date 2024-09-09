@@ -4,7 +4,6 @@ import { Request, Response } from "express";
 import Team from "../model/team";
 import Fixture from "../model/fixture";
 import { seasonFormat } from "../utils";
-import { client } from "../config/redis";
 
 // @desc    Create a new fixture
 // @route   POST /api/fixtures
@@ -203,7 +202,7 @@ const updateFixture = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/fixtures/:fixtureStatus
 // @access  Private
 const getFixtureByStatus = asyncHandler(async (req: Request, res: Response) => {
-  const cachedFixturesData = await client.get("fixtures");
+  // const cachedFixturesData = await client.get("fixtures");
 
   if (
     req.params.fixtureStatus !== "COMPLETED" &&
@@ -217,51 +216,24 @@ const getFixtureByStatus = asyncHandler(async (req: Request, res: Response) => {
     return;
   }
 
-  if (cachedFixturesData) {
-    const fixtures = JSON.parse(cachedFixturesData);
+  const fixtures = await Fixture.find({ status: req.params.fixtureStatus });
 
-    let newFixture = fixtures.filter(
-      (data: { status: string }) => data.status === req.params.fixtureStatus
-    );
-
-    if (newFixture.length === 0) {
-      res.status(400).json({
-        status: "error",
-        method: req.method,
-        message: `No fixtures available!`,
-      });
-      return;
-    }
-
-    res.json({
-      status: "success",
+  if (fixtures.length === 0) {
+    res.status(400).json({
+      status: "error",
       method: req.method,
-      message: `Fixtures with status ${req.params.fixtureStatus} returned successfully`,
-      data: newFixture,
+      message: `No fixtures available!`,
     });
-  } else {
-    const fixtures = await Fixture.find({ status: req.params.fixtureStatus });
-
-    if (fixtures.length === 0) {
-      res.status(400).json({
-        status: "error",
-        method: req.method,
-        message: `No fixtures available!`,
-      });
-      return;
-    }
-
-    await client.set("fixtures", JSON.stringify(fixtures), {
-      EX: process.env.DEFAULT_EXPIRATION as unknown as number,
-    });
-
-    res.json({
-      status: "success",
-      method: req.method,
-      message: `Fixtures with status ${req.params.fixtureStatus} returned successfully`,
-      data: fixtures,
-    });
+    return;
   }
+
+  res.json({
+    status: "success",
+    method: req.method,
+    message: `Fixtures with status ${req.params.fixtureStatus} returned successfully`,
+    data: fixtures,
+  });
+  // }
 });
 
 // @desc    Search for fixtures
