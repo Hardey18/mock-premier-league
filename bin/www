@@ -4,7 +4,7 @@
  * Module dependencies.
  */
 
-var { connectRedis } =require('../dist/config/redis');
+// var { connectRedis } =require('../dist/config/redis');
 
 var app = require('../dist/app').default;
 var debug = require('debug')('mock-premier-league:server');
@@ -27,7 +27,7 @@ var server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-connectRedis();
+// connectRedis();
 server.listen(port, () => {
   console.log(`Server started on port ${port}`);
 });

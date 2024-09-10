@@ -1,13 +1,13 @@
-import { createClient } from 'redis';
+// import { createClient } from 'redis';
 
-const client = createClient({
-    url: process.env.REDIS_BASE_URL,
-});
+// const client = createClient({
+//     url: process.env.REDIS_BASE_URL,
+// });
 
-client.on('error', (err) => console.error('Redis Client Error', err));
+// client.on('error', (err) => console.error('Redis Client Error', err));
 
-async function connectRedis() {
-    await client.connect();
-}
+// async function connectRedis() {
+//     await client.connect();
+// }
 
-export { client, connectRedis };
+// export { client, connectRedis };

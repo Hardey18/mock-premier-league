@@ -2,7 +2,6 @@ import asyncHandler from "express-async-handler";
 import { Request, Response } from "express";
 
 import Team from "../model/team";
-import { client } from "../config/redis";
 
 // @desc    Create a new team
 // @route   POST /api/teams
@@ -95,22 +94,22 @@ const updateTeam = asyncHandler(async (req: Request, res: Response) => {
 // @route   GET /api/teams
 // @access  Private
 const getTeams = asyncHandler(async (req: any, res: any) => {
-  const cachedTeamsData = await client.get("teams");
+  // const cachedTeamsData = await client.get("teams");
 
-  if (cachedTeamsData) {
-    const teams = JSON.parse(cachedTeamsData);
-    return res.json({
-      status: "success",
-      method: req.method,
-      message: "All teams returned successfully from cache",
-      data: teams,
-    });
-  } else {
+  // if (cachedTeamsData) {
+  //   const teams = JSON.parse(cachedTeamsData);
+  //   return res.json({
+  //     status: "success",
+  //     method: req.method,
+  //     message: "All teams returned successfully from cache",
+  //     data: teams,
+  //   });
+  // } else {
     const teams = await Team.find();
 
-    await client.set("teams", JSON.stringify(teams), {
-      EX: process.env.DEFAULT_EXPIRATION as unknown as number,
-    });
+    // await client.set("teams", JSON.stringify(teams), {
+    //   EX: process.env.DEFAULT_EXPIRATION as unknown as number,
+    // });
 
     return res.json({
       status: "success",
@@ -118,7 +117,7 @@ const getTeams = asyncHandler(async (req: any, res: any) => {
       message: "All teams returned successfully from database",
       data: teams,
     });
-  }
+  // }
 });
 
 // @desc    Get single team by ID
